@@ -10,6 +10,8 @@
 ; gnita@njit 07-Dec-2017 change explicit TR index from 2L to gx_voxelid(/tr) to allow future redefinition if needed
 ; Eduard@Glasgow & Gelu@njit 28-Feb-2018 added albedo component
 ; Eduard@Glasgow & Gelu@njit 19-June-2018 changed albedo matrix interpolation
+; Eduard@Glasgow  26-May-2023 changed the flux to account for not 1AU observations. 
+; We need to pass in solar radius!
 
 
 pro xray_tt_albedo,parms,rowdata,rparms,xray_cs=xray_cs,albedo=albedo,info=info
@@ -412,6 +414,9 @@ pro xray_tt_albedo,parms,rowdata,rparms,xray_cs=xray_cs,albedo=albedo,info=info
         ; background thermal electron distribution
       ENDFOR
       ;ends FOR loop over voxels
+      eph_dataout= eph_dataout*(r_sun_obs/960.)^2
+      ; corrects for different distances of s/c, factor 1 for r_sun=960 arcsec 
+      ; requires solar radius in arcseconds 
       rowdata[r,*,0]=eph_dataout
       rowdata[r,*,1]=(n_elements(albedo) gt 0?anisotropy*(transpose(albedo)#(eph_dataout*deph)):0)
     end
